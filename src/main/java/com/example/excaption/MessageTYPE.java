@@ -4,8 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum MessageTYPE {
-    No_Record_Exist("1001","kayıt bulunamadı"),
-    GENERAL_EXCAPTİON("9999","genel bir hata oluştu");
+    No_Record_Exist("1001","Kayıt bulunamadı!"),
+    GENERAL_EXCAPTİON("9999","Genel bir hata oluştu!"),
+    No_Food("1002","Bu besin bulunamadı!");
+
 
 
     private String code;

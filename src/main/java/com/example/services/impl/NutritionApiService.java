@@ -72,7 +72,7 @@ public class NutritionApiService {
         String auth = clientId + ":" + clientSecret;
         return Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
     }
-
+//------------------------------------------------------------------------------------------
     public List<FoodDTO> searchFood(String foodName) {
         authenticate();
 
@@ -98,6 +98,7 @@ public class NutritionApiService {
         List<FoodDTO> foods = new ArrayList<>();
 
         try {
+
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.getBody());
 
@@ -105,11 +106,15 @@ public class NutritionApiService {
 
             if (foodsNode.isArray()) {
                 for (JsonNode foodNode : foodsNode) {
-                    String name = foodNode.path("food_name").asText();
-                    Double calories = foodNode.path("food_description").asText().contains("kcal") ?
-                            extractCalories(foodNode.path("food_description").asText()) : null;
+                    String description = foodNode.path("food_description").asText().toLowerCase();
 
-                    foods.add(new FoodDTO(name, calories, null, null, null));
+                    String name = foodNode.path("food_name").asText();
+                    Double calories = description.contains("kcal") ? extractCalories(description) : null;
+                    Double fat = description.contains("fat") ? extractFat(description) : null;
+                    Double protein = description.contains("protein") ? extractProtein(description) : null;
+                    Double carbs = description.contains("carbs") ? extractCarbs(description) : null;
+
+                    foods.add(new FoodDTO(name, calories, protein, fat, carbs));
                 }
             }
         } catch (Exception e) {
@@ -118,19 +123,54 @@ public class NutritionApiService {
 
         return foods;
     }
-
+//---------------------------------------------------------------
     private Double extractCalories(String description) {
+        return extractValue(description, "calories");
+    }
+//--------------------------------------------------------------
+    private Double extractFat(String description) {
+        return extractValue(description, "Fat");
+    }
+//----------------------------------------------------------------
+    private Double extractProtein(String description) {
+        return extractValue(description, "Protein");
+    }
+//------------------------------------------------------------
+    private Double extractCarbs(String description) {
+        return extractValue(description, "Carbs");
+    }
+
+    private Double extractValue(String description, String key) {
         try {
-            // Description örneği: "Per 100g - 52 kcal, 0g fat, 0g protein, 14g carbs"
-            int kcalIndex = description.indexOf("kcal");
-            if (kcalIndex != -1) {
-                String beforeKcal = description.substring(0, kcalIndex).trim();
-                String[] parts = beforeKcal.split(" ");
-                return Double.parseDouble(parts[parts.length - 1]);
+            // normalize her şey küçük harf
+            description = description.toLowerCase();
+            key = key.toLowerCase();
+
+            // parçalara ayır
+            String[] parts = description.split("\\|");
+
+            for (String part : parts) {
+                part = part.trim();
+                if (part.contains(key)) {
+                    // örnek: calories: 89kcal
+                    String[] split = part.split(":");
+                    if (split.length == 2) {
+                        String value = split[1]
+                                .replace("kcal", "")
+                                .replace("g", "")
+                                .replaceAll("[^0-9.]", "") // sadece sayı ve . kalsın
+                                .trim();
+                        return Double.parseDouble(value);
+
+                    }
+                }
             }
         } catch (Exception ignored) {
         }
         return null;
     }
+
+
+
 }
 

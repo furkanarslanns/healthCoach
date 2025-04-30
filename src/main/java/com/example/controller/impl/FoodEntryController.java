@@ -30,4 +30,15 @@ public class FoodEntryController {
     public ResponseEntity<List<FoodEntry>> getAllFoodEntries() {
         return ResponseEntity.ok(foodEntryService.getAllFoodEntries());
     }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<FoodEntry> updateFoodEntry(@PathVariable Long id, @RequestBody FoodEntry updatedEntry) {
+        FoodEntry updated = foodEntryService.updateFoodEntry(id, updatedEntry);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteFoodEntry(@PathVariable Long id) {
+        foodEntryService.deleteFoodEntry(id);
+        return ResponseEntity.ok("Başarıyla silindi.");
+    }
 }
