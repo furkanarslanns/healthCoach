@@ -19,7 +19,7 @@ public class PredictionControllerImpl implements IPredictionController {
     @Autowired
     PredictionServiceImpl predictionService;
 
-    @PostMapping
+    @PostMapping("/post")
     @Override
     public RootEntity<PredictionResponseDTO> getPrediction(@Valid @RequestBody UserInputRequestDTO requestDTO) {
 
