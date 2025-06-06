@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.example.controller.RootEntity.ok;
 @RestController
-@RequestMapping("/api/predict")
+@RequestMapping("/predict")
 public class PredictionControllerImpl implements IPredictionController {
     @Autowired
     PredictionServiceImpl predictionService;
 
-    @PostMapping("/post")
+    @PostMapping
     @Override
     public RootEntity<PredictionResponseDTO> getPrediction(@Valid @RequestBody UserInputRequestDTO requestDTO) {
 
